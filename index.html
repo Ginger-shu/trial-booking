@@ -57,21 +57,18 @@
             padding: 25px 20px;
         }
 
-        .header-logo {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-
         .header h1 {
-            font-size: 26px;
+            font-size: 32px;
             font-weight: 700;
             color: var(--green-dark);
             margin-bottom: 8px;
+            letter-spacing: 8px;
         }
 
         .header p {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--gray);
+            font-weight: 500;
         }
 
         /* Card */
@@ -929,9 +926,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="header-logo">🏋️</div>
-            <h1>體驗課程預約</h1>
-            <p>衡點健身 Balance Point Fitness</p>
+            <h1>─ 衡點 ─</h1>
+            <p>體驗課程預約</p>
         </div>
 
         <!-- Step Indicator - 3 Steps -->
@@ -986,11 +982,12 @@
                         <div class="payment-pending-icon">✨</div>
                         <div class="payment-pending-title">即將完成預約</div>
                         <div class="payment-pending-message">
-                            付款完成後，行政人員將進行確認<br>
-                            並傳送預約完成資訊到您的 LINE<br><br>
+                            付款連結已傳送給您<br>
+                            完成付款後，行政人員將進行確認<br>
+                            並傳送預約完成資訊到您的 LINE<br>
+                            謝謝您，期待課程中與您相見！<br><br>
                             <strong>付款期限至 <span id="existingDeadline">-</span></strong><br>
-                            逾時將自動釋出名額<br><br>
-                            謝謝您，期待課程中與您相見！
+                            逾時將自動釋出名額
                         </div>
                     </div>
                     <button class="btn btn-payment" onclick="goToPayment()" style="margin-bottom: 15px;">

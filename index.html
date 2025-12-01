@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>體驗課程預約 | 衡點健身</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        :root {
+            /* 品牌色彩 */
+            --white: #ffffff;
+            --gray: #808080;
+            
+            /* 青春綠 */
+            --green: #7ac19a;
+            --green-light: #e2ede6;
+            --green-dark: #5f846f;
+            
+            /* 幸福粉 */
+            --pink: #f2ac98;
+            --pink-light: #faece8;
+            --pink-dark: #c67566;
+            
+            /* 活力黃 */
+            --yellow: #ffe08b;
+            --yellow-light: #fcf4e3;
+            --yellow-dark: #ba9e60;
+            
+            /* 明鏡藍 */
+            --blue: #9fcccc;
+            --blue-light: #daedec;
+            --blue-dark: #66888e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, var(--green-light) 0%, var(--white) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+        .header-logo {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Card */
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(95, 132, 111, 0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--green-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .icon {
+            font-size: 24px;
+        }
+
+        /* Step Indicator - 3 Steps */
+        .steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--white);
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(95, 132, 111, 0.1);
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--green-light);
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: var(--green);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(122, 193, 154, 0.4);
+            transform: scale(1.1);
+        }
+
+        .step.completed {
+            background: var(--green-dark);
+            color: var(--white);
+        }
+
+        .step-line {
+            width: 40px;
+            height: 3px;
+            background: var(--green-light);
+            border-radius: 2px;
+        }
+
+        .step-line.completed {
+            background: var(--green-dark);
+        }
+
+        /* Course Selection */
+        .course-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .course-card {
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 22px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* AI體態檢測 - 藍色 */
+        .course-card[data-course="ai"] {
+            background: var(--blue-light);
+        }
+        .course-card[data-course="ai"]:hover {
+            border-color: var(--blue);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(159, 204, 204, 0.3);
+        }
+        .course-card[data-course="ai"].selected {
+            background: var(--blue);
+            border-color: var(--blue-dark);
+        }
+
+        /* 器械皮拉提斯 - 粉色 */
+        .course-card[data-course="pilates"] {
+            background: var(--pink-light);
+        }
+        .course-card[data-course="pilates"]:hover {
+            border-color: var(--pink);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(242, 172, 152, 0.3);
+        }
+        .course-card[data-course="pilates"].selected {
+            background: var(--pink);
+            border-color: var(--pink-dark);
+        }
+
+        /* 重訓 - 綠色 */
+        .course-card[data-course="weight"] {
+            background: var(--green-light);
+        }
+        .course-card[data-course="weight"]:hover {
+            border-color: var(--green);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(122, 193, 154, 0.3);
+        }
+        .course-card[data-course="weight"].selected {
+            background: var(--green);
+            border-color: var(--green-dark);
+        }
+
+        /* 伸展 - 黃色 */
+        .course-card[data-course="stretch"] {
+            background: var(--yellow-light);
+        }
+        .course-card[data-course="stretch"]:hover {
+            border-color: var(--yellow);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 224, 139, 0.3);
+        }
+        .course-card[data-course="stretch"].selected {
+            background: var(--yellow);
+            border-color: var(--yellow-dark);
+        }
+
+        .course-card.selected .course-icon,
+        .course-card.selected .course-name,
+        .course-card.selected .course-desc {
+            color: var(--white);
+        }
+
+        .course-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .course-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .course-desc {
+            font-size: 12px;
+            color: var(--gray);
+            line-height: 1.4;
+        }
+
+        /* Calendar */
+        .calendar {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--green-light);
+        }
+
+        .calendar-nav {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--white);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--green-dark);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .calendar-nav:hover {
+            background: var(--green);
+            color: var(--white);
+        }
+
+        .calendar-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-nav:disabled:hover {
+            background: var(--white);
+            color: var(--green-dark);
+        }
+
+        .calendar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--green-dark);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--green-light);
+            padding: 10px 5px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--green-dark);
+            padding: 5px;
+        }
+
+        .calendar-weekday.weekend {
+            color: var(--pink-dark);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        .calendar-day:hover:not(.disabled):not(.empty) {
+            background: var(--green-light);
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--green);
+            font-weight: 700;
+        }
+
+        .calendar-day.selected {
+            background: var(--green);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .calendar-day.disabled {
+            color: #ddd;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+        }
+
+        .calendar-day.has-slots {
+            position: relative;
+        }
+
+        .calendar-day.has-slots::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 5px;
+            height: 5px;
+            background: var(--green);
+            border-radius: 50%;
+        }
+
+        .calendar-day.selected.has-slots::after {
+            background: var(--white);
+        }
+
+        /* Selected Date Display */
+        .selected-date-display {
+            background: var(--green-light);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .selected-date-display.show {
+            display: block;
+        }
+
+        .selected-date-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--green-dark);
+        }
+
+        /* Time Slots */
+        .time-slots-section {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .time-slots-section.show {
+            display: block;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .time-slot {
+            padding: 14px 8px;
+            background: var(--green-light);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .time-slot:hover:not(.disabled) {
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+
+        .time-slot.selected {
+            background: var(--green);
+            border-color: var(--green-dark);
+            color: var(--white);
+        }
+
+        .time-slot.disabled {
+            background: #f0f0f0;
+            color: #ccc;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .time-slot-time {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* Summary */
+        .summary-box {
+            background: var(--green-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(95, 132, 111, 0.2);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--green-dark);
+            font-size: 15px;
+        }
+
+        /* Price Box */
+        .price-box {
+            background: linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .price-label {
+            font-size: 14px;
+            color: var(--yellow-dark);
+            margin-bottom: 5px;
+        }
+
+        .price-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--yellow-dark);
+        }
+
+        .price-note {
+            font-size: 12px;
+            color: var(--yellow-dark);
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(122, 193, 154, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(95, 132, 111, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--green-light);
+            color: var(--green-dark);
+        }
+
+        .btn-secondary:hover {
+            background: #d5e5da;
+        }
+
+        .btn-payment {
+            background: linear-gradient(135deg, var(--pink) 0%, var(--pink-dark) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(242, 172, 152, 0.4);
+            font-size: 18px;
+            padding: 18px;
+        }
+
+        .btn-payment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(198, 117, 102, 0.5);
+        }
+
+        .btn-danger {
+            background: var(--pink-dark);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(198, 117, 102, 0.4);
+        }
+
+        .btn-danger:hover {
+            background: #b5655a;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        /* Existing Booking */
+        .existing-booking {
+            background: var(--yellow-light);
+            border: 2px solid var(--yellow);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .existing-booking-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--yellow-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .existing-booking-info {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .existing-booking-info .summary-item {
+            border-bottom-color: var(--yellow-light);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--green-light);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Success */
+        .success-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-bottom: 10px;
+        }
+
+        .success-message {
+            color: var(--gray);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* Hide sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Notice */
+        .notice {
+            background: var(--blue-light);
+            border-left: 4px solid var(--blue);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 20px;
+        }
+
+        .notice p {
+            color: var(--blue-dark);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Cancel Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--green-dark);
+            margin-bottom: 10px;
+        }
+
+        .modal-message {
+            color: var(--gray);
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* Payment Pending */
+        .payment-pending {
+            background: linear-gradient(135deg, var(--pink-light) 0%, var(--pink) 100%);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .payment-pending-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .payment-pending-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--pink-dark);
+            margin-bottom: 10px;
+        }
+
+        .payment-pending-message {
+            font-size: 14px;
+            color: var(--pink-dark);
+            line-height: 1.6;
+        }
+
+        /* Reserved Info */
+        .reserved-info {
+            background: var(--green-light);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .reserved-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(95, 132, 111, 0.2);
+        }
+
+        .reserved-item:last-child {
+            border-bottom: none;
+        }
+
+        .reserved-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .reserved-value {
+            font-weight: 600;
+            color: var(--green-dark);
+            font-size: 14px;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: var(--yellow-light);
+            border: 2px solid var(--yellow);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-box p {
+            color: var(--yellow-dark);
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Booking Status */
+        .booking-status {
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .booking-status.pending {
+            background: var(--yellow-light);
+            border: 2px solid var(--yellow);
+        }
+
+        .booking-status.confirmed {
+            background: var(--green-light);
+            border: 2px solid var(--green);
+        }
+
+        .booking-status-icon {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .booking-status-text {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .booking-status.pending .booking-status-text {
+            color: var(--yellow-dark);
+        }
+
+        .booking-status.confirmed .booking-status-text {
+            color: var(--green-dark);
+        }
+
+        /* Confirmed Box */
+        .confirmed-box {
+            background: linear-gradient(135deg, var(--green-light) 0%, var(--green) 100%);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .confirmed-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .confirmed-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--green-dark);
+            margin-bottom: 8px;
+        }
+
+        .confirmed-message {
+            font-size: 14px;
+            color: var(--green-dark);
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--green-light);
+            margin: 20px 0;
+        }
+
+        /* Loading Section */
+        .loading-section {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        /* Time slots title */
+        .time-slots-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--green-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-logo">🏋️</div>
+            <h1>體驗課程預約</h1>
+            <p>衡點健身 Balance Point Fitness</p>
+        </div>
+
+        <!-- Step Indicator - 3 Steps -->
+        <div class="steps" id="stepIndicator">
+            <div class="step active" data-step="1">1</div>
+            <div class="step-line" id="line1"></div>
+            <div class="step" data-step="2">2</div>
+            <div class="step-line" id="line2"></div>
+            <div class="step" data-step="3">3</div>
+        </div>
+
+        <!-- Loading Section (進入頁面時顯示) -->
+        <div class="section active" id="loadingSection">
+            <div class="card">
+                <div class="loading-section">
+                    <div class="spinner" style="margin: 0 auto;"></div>
+                    <div class="loading-text" style="margin-top: 20px;">載入中...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Booking Section -->
+        <div class="section" id="existingBookingSection">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📋</span>
+                    您的體驗課程預約
+                </div>
+                
+                <div class="booking-status" id="bookingStatusBox">
+                    <!-- 狀態會由 JS 動態更新 -->
+                </div>
+
+                <div class="summary-box" style="margin-top: 20px;">
+                    <div class="summary-item">
+                        <span class="summary-label">課程類型</span>
+                        <span class="summary-value" id="existingCourse">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">預約日期</span>
+                        <span class="summary-value" id="existingDate">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">預約時段</span>
+                        <span class="summary-value" id="existingTime">-</span>
+                    </div>
+                </div>
+
+                <!-- 待付款狀態顯示 -->
+                <div id="pendingPaymentSection" style="display: none;">
+                    <div class="payment-pending">
+                        <div class="payment-pending-icon">💳</div>
+                        <div class="payment-pending-title">請完成付款以確認預約</div>
+                        <div class="payment-pending-message">
+                            付款期限至 <strong id="existingDeadline">-</strong><br>
+                            逾時將自動釋出名額
+                        </div>
+                    </div>
+                    <button class="btn btn-payment" onclick="goToPayment()" style="margin-bottom: 15px;">
+                        💳 前往付款
+                    </button>
+                </div>
+
+                <!-- 已付款狀態顯示 -->
+                <div id="confirmedSection" style="display: none;">
+                    <div class="confirmed-box">
+                        <div class="confirmed-icon">✅</div>
+                        <div class="confirmed-title">預約已確認</div>
+                        <div class="confirmed-message">
+                            我們將透過 LINE 通知您教練安排
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <p style="color: var(--gray); font-size: 14px; line-height: 1.6; margin-bottom: 15px; text-align: center;">
+                    如需更換課程或時段，請先取消目前的預約
+                </p>
+                <button class="btn btn-danger" onclick="showCancelModal()">
+                    ❌ 取消預約
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 1: Course Selection -->
+        <div class="section" id="step1Section">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📋</span>
+                    選擇體驗課程
+                </div>
+                <div class="course-grid">
+                    <div class="course-card" data-course="ai" data-course-name="AI體態檢測" data-course-type="AI 3D體態分析師">
+                        <span class="course-icon">🤖</span>
+                        <div class="course-name">AI體態檢測</div>
+                        <div class="course-desc">3D掃描分析體態</div>
+                    </div>
+                    <div class="course-card" data-course="pilates" data-course-name="器械皮拉提斯" data-course-type="皮拉提斯">
+                        <span class="course-icon">🧘</span>
+                        <div class="course-name">器械皮拉提斯</div>
+                        <div class="course-desc">核心穩定訓練</div>
+                    </div>
+                    <div class="course-card" data-course="weight" data-course-name="重訓" data-course-type="重訓教練">
+                        <span class="course-icon">💪</span>
+                        <div class="course-name">重訓</div>
+                        <div class="course-desc">肌力強化訓練</div>
+                    </div>
+                    <div class="course-card" data-course="stretch" data-course-name="伸展" data-course-type="肌肉賦能伸展">
+                        <span class="course-icon">🤸</span>
+                        <div class="course-name">伸展</div>
+                        <div class="course-desc">筋膜放鬆伸展</div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="step1Next" disabled onclick="goToStep(2)">
+                        下一步 →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Calendar & Time Selection -->
+        <div class="section" id="step2Section">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📅</span>
+                    選擇日期與時段
+                </div>
+                
+                <!-- Calendar -->
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" id="prevMonth" onclick="changeMonth(-1)">‹</button>
+                        <div class="calendar-title" id="calendarTitle">2024年12月</div>
+                        <button class="calendar-nav" id="nextMonth" onclick="changeMonth(1)">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <div class="calendar-weekday weekend">日</div>
+                        <div class="calendar-weekday">一</div>
+                        <div class="calendar-weekday">二</div>
+                        <div class="calendar-weekday">三</div>
+                        <div class="calendar-weekday">四</div>
+                        <div class="calendar-weekday">五</div>
+                        <div class="calendar-weekday weekend">六</div>
+                    </div>
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- Days will be generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Selected Date Display -->
+                <div class="selected-date-display" id="selectedDateDisplay">
+                    <span class="selected-date-text" id="selectedDateText">已選擇：12月5日 (四)</span>
+                </div>
+
+                <!-- Time Slots -->
+                <div class="time-slots-section" id="timeSlotsSection">
+                    <div class="time-slots-title">
+                        <span>⏰</span>
+                        可預約時段
+                    </div>
+                    <div id="timeSlotsContainer">
+                        <!-- Time slots will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 15px 25px;">
+                <div class="btn-group" style="margin: 0;">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">
+                        ← 上一步
+                    </button>
+                    <button class="btn btn-primary" id="step2Next" disabled onclick="goToStep(3)">
+                        下一步 →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Confirmation -->
+        <div class="section" id="step3Section">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">✅</span>
+                    確認預約資訊
+                </div>
+                
+                <div class="summary-box">
+                    <div class="summary-item">
+                        <span class="summary-label">課程類型</span>
+                        <span class="summary-value" id="confirmCourse">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">預約日期</span>
+                        <span class="summary-value" id="confirmDate">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">預約時段</span>
+                        <span class="summary-value" id="confirmTime">-</span>
+                    </div>
+                </div>
+
+                <div class="notice">
+                    <p>📌 確認預約後，付款連結將發送至您的 LINE。<br>
+                    請於 12 小時內完成付款，逾時將自動釋出名額。</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">
+                        ← 修改
+                    </button>
+                    <button class="btn btn-primary" id="confirmBtn" onclick="confirmBooking()">
+                        確認預約
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Section -->
+        <div class="section" id="successSection">
+            <div class="card">
+                <div class="success-container">
+                    <div class="success-icon">🎉</div>
+                    <div class="success-title">預約保留中！</div>
+                    <div class="success-message">
+                        付款連結已發送至您的 LINE<br>
+                        請於 <strong>12 小時內</strong> 完成付款<br>
+                        <span id="paymentDeadline" style="color: var(--pink-dark); font-weight: 600;"></span>
+                    </div>
+                    
+                    <div class="reserved-info">
+                        <div class="reserved-item">
+                            <span class="reserved-label">課程</span>
+                            <span class="reserved-value" id="reservedCourse">-</span>
+                        </div>
+                        <div class="reserved-item">
+                            <span class="reserved-label">日期</span>
+                            <span class="reserved-value" id="reservedDate">-</span>
+                        </div>
+                        <div class="reserved-item">
+                            <span class="reserved-label">時段</span>
+                            <span class="reserved-value" id="reservedTime">-</span>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <p>⚠️ 逾時將自動釋出名額<br>請勿再操作結帳</p>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="closeLiff()">
+                        關閉視窗
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal">
+            <div class="modal-icon">🤔</div>
+            <div class="modal-title">確定要取消預約嗎？</div>
+            <div class="modal-message">取消後您可以重新預約其他時段或課程。</div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="hideCancelModal()">
+                    再想想
+                </button>
+                <button class="btn btn-danger" onclick="cancelBooking()">
+                    確定取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 設定區域
+        // ============================================
+        const CONFIG = {
+            // LIFF ID
+            LIFF_ID: '2007947083-yb9NPJ7e',
+            
+            // Webhook URL (Make.com) - 統一入口
+            WEBHOOK_URL: 'https://hook.us2.make.com/fpz9ihnccpnlh65xc7p6q1lnrreeqhaf',
+            
+            // 各課程付款連結
+            PAYMENT_URLS: {
+                'ai': '',           // AI體態檢測
+                'pilates': '',      // 器械皮拉提斯
+                'weight': '',       // 重訓
+                'stretch': ''       // 伸展
+            }
+        };
+
+        // ============================================
+        // 全域變數
+        // ============================================
+        let userId = null;
+        let currentStep = 1;
+        let selectedCourse = null;
+        let selectedDate = null;
+        let selectedTime = null;
+        let existingBooking = null;
+        
+        // 月曆相關
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // ============================================
+        // 頁面初始化
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+
+        async function initializePage() {
+            try {
+                // LIFF 初始化
+                if (CONFIG.LIFF_ID) {
+                    await liff.init({ liffId: CONFIG.LIFF_ID });
+                    
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                        return;
+                    }
+                    
+                    const profile = await liff.getProfile();
+                    userId = profile.userId;
+                } else {
+                    // LIFF ID 未設定時的錯誤處理
+                    console.error('LIFF ID 未設定');
+                    alert('系統設定錯誤，請聯繫客服');
+                    return;
+                }
+                
+                // 檢查是否已有預約
+                await checkExistingBooking();
+                
+            } catch (error) {
+                console.error('Initialize failed:', error);
+                alert('載入失敗，請重新開啟頁面');
+            }
+        }
+
+        async function checkExistingBooking() {
+            try {
+                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'checkBooking',
+                        userId: userId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.hasBooking && data.booking) {
+                    existingBooking = data.booking;
+                    showExistingBookingPage(data.booking);
+                } else {
+                    showBookingFlow();
+                }
+            } catch (error) {
+                console.error('Check booking failed:', error);
+                showBookingFlow();
+            }
+        }
+
+        function showExistingBookingPage(booking) {
+            // 填入預約資訊
+            document.getElementById('existingCourse').textContent = booking.courseName || '-';
+            document.getElementById('existingDate').textContent = booking.date ? formatDisplayDate(booking.date) : '-';
+            document.getElementById('existingTime').textContent = 
+                booking.startTime && booking.endTime ? `${booking.startTime} - ${booking.endTime}` : '-';
+            
+            // 根據狀態顯示不同內容
+            const statusBox = document.getElementById('bookingStatusBox');
+            const pendingSection = document.getElementById('pendingPaymentSection');
+            const confirmedSection = document.getElementById('confirmedSection');
+            
+            if (booking.status === '待付款' || booking.status === 'pending') {
+                statusBox.className = 'booking-status pending';
+                statusBox.innerHTML = `
+                    <div class="booking-status-icon">⏳</div>
+                    <div class="booking-status-text">待付款</div>
+                `;
+                
+                if (booking.deadline) {
+                    document.getElementById('existingDeadline').textContent = booking.deadline;
+                }
+                
+                pendingSection.style.display = 'block';
+                confirmedSection.style.display = 'none';
+            } else {
+                statusBox.className = 'booking-status confirmed';
+                statusBox.innerHTML = `
+                    <div class="booking-status-icon">✅</div>
+                    <div class="booking-status-text">已確認</div>
+                `;
+                
+                pendingSection.style.display = 'none';
+                confirmedSection.style.display = 'block';
+            }
+            
+            document.getElementById('stepIndicator').style.display = 'none';
+            showSection('existingBookingSection');
+        }
+
+        function showBookingFlow() {
+            document.getElementById('stepIndicator').style.display = 'flex';
+            showSection('step1Section');
+            updateStepIndicator(1);
+        }
+
+        // ============================================
+        // 課程選擇
+        // ============================================
+        document.querySelectorAll('.course-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.course-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                selectedCourse = {
+                    id: this.dataset.course,
+                    name: this.dataset.courseName,
+                    type: this.dataset.courseType
+                };
+                
+                selectedDate = null;
+                selectedTime = null;
+                
+                document.getElementById('step1Next').disabled = false;
+            });
+        });
+
+        // ============================================
+        // 月曆功能
+        // ============================================
+        function renderCalendar() {
+            const calendarDays = document.getElementById('calendarDays');
+            const calendarTitle = document.getElementById('calendarTitle');
+            
+            // 更新標題
+            calendarTitle.textContent = `${currentYear}年${currentMonth + 1}月`;
+            
+            // 取得當月第一天和最後一天
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const startWeekday = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+            
+            // 清空並生成日期
+            calendarDays.innerHTML = '';
+            
+            // 填充空白
+            for (let i = 0; i < startWeekday; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'calendar-day empty';
+                calendarDays.appendChild(emptyDiv);
+            }
+            
+            // 填充日期
+            for (let day = 1; day <= totalDays; day++) {
+                const dateObj = new Date(currentYear, currentMonth, day);
+                const dateStr = formatDate(dateObj);
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day';
+                dayDiv.textContent = day;
+                dayDiv.dataset.date = dateStr;
+                
+                // 判斷是否為今天
+                if (dateObj.getTime() === today.getTime()) {
+                    dayDiv.classList.add('today');
+                }
+                
+                // 判斷是否為過去日期
+                if (dateObj < today) {
+                    dayDiv.classList.add('disabled');
+                } else {
+                    // 判斷是否有時段（測試用）
+                    if (mockDatesWithSlots.has(dateStr)) {
+                        dayDiv.classList.add('has-slots');
+                    }
+                    
+                    // 判斷是否已選擇
+                    if (selectedDate === dateStr) {
+                        dayDiv.classList.add('selected');
+                    }
+                    
+                    dayDiv.addEventListener('click', () => selectDate(dateStr, dayDiv));
+                }
+                
+                calendarDays.appendChild(dayDiv);
+            }
+            
+            // 更新導航按鈕狀態
+            updateNavButtons();
+        }
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            
+            renderCalendar();
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevMonth');
+            const todayMonth = today.getMonth();
+            const todayYear = today.getFullYear();
+            
+            // 不能往前超過當月
+            if (currentYear === todayYear && currentMonth <= todayMonth) {
+                prevBtn.disabled = true;
+            } else {
+                prevBtn.disabled = false;
+            }
+            
+            // 最多往後3個月
+            const maxMonth = todayMonth + 3;
+            const maxYear = todayYear + Math.floor(maxMonth / 12);
+            const adjustedMaxMonth = maxMonth % 12;
+            
+            const nextBtn = document.getElementById('nextMonth');
+            if (currentYear > maxYear || (currentYear === maxYear && currentMonth >= adjustedMaxMonth)) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        function selectDate(dateStr, dayElement) {
+            // 移除之前的選擇
+            document.querySelectorAll('.calendar-day.selected').forEach(d => d.classList.remove('selected'));
+            
+            // 選擇新日期
+            dayElement.classList.add('selected');
+            selectedDate = dateStr;
+            selectedTime = null;
+            document.getElementById('step2Next').disabled = true;
+            
+            // 顯示選擇的日期
+            const dateObj = new Date(dateStr);
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            document.getElementById('selectedDateText').textContent = 
+                `已選擇：${dateObj.getMonth() + 1}月${dateObj.getDate()}日 (${weekdays[dateObj.getDay()]})`;
+            document.getElementById('selectedDateDisplay').classList.add('show');
+            
+            // 載入時段
+            loadTimeSlots(dateStr);
+        }
+
+        // ============================================
+        // 時段載入
+        // ============================================
+        async function loadTimeSlots(dateStr) {
+            const section = document.getElementById('timeSlotsSection');
+            const container = document.getElementById('timeSlotsContainer');
+            
+            section.classList.add('show');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">載入可預約時段...</div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'getAvailableSlots',
+                        courseType: selectedCourse.type,
+                        date: dateStr
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.slots && data.slots.length > 0) {
+                    displayTimeSlots(data.slots);
+                } else {
+                    showNoSlots();
+                }
+            } catch (error) {
+                console.error('Load time slots failed:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <p>載入失敗，請稍後再試</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayTimeSlots(slots) {
+            const container = document.getElementById('timeSlotsContainer');
+            container.innerHTML = '<div class="time-slots"></div>';
+            const slotsContainer = container.querySelector('.time-slots');
+            
+            slots.forEach(slot => {
+                const div = document.createElement('div');
+                div.className = 'time-slot';
+                div.dataset.start = slot.startTime;
+                div.dataset.end = slot.endTime;
+                div.innerHTML = `
+                    <div class="time-slot-time">${slot.startTime}</div>
+                `;
+                
+                div.addEventListener('click', () => selectTimeSlot(slot, div));
+                slotsContainer.appendChild(div);
+            });
+        }
+
+        function showNoSlots() {
+            const container = document.getElementById('timeSlotsContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">😢</div>
+                    <p>此日期沒有可預約的時段<br>請選擇其他日期</p>
+                </div>
+            `;
+        }
+
+        function selectTimeSlot(slot, element) {
+            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            selectedTime = {
+                startTime: slot.startTime,
+                endTime: slot.endTime
+            };
+            
+            document.getElementById('step2Next').disabled = false;
+        }
+
+        // ============================================
+        // 步驟導航
+        // ============================================
+        function goToStep(step) {
+            if (step === 2 && !selectedCourse) {
+                alert('請選擇課程');
+                return;
+            }
+            
+            if (step === 3) {
+                if (!selectedDate) {
+                    alert('請選擇日期');
+                    return;
+                }
+                if (!selectedTime) {
+                    alert('請選擇時段');
+                    return;
+                }
+                updateConfirmation();
+            }
+            
+            currentStep = step;
+            
+            if (step === 2) {
+                // 重置月曆到當月
+                currentYear = today.getFullYear();
+                currentMonth = today.getMonth();
+                renderCalendar();
+                
+                // 重置時段區域
+                document.getElementById('selectedDateDisplay').classList.remove('show');
+                document.getElementById('timeSlotsSection').classList.remove('show');
+            }
+            
+            showSection(`step${step}Section`);
+            updateStepIndicator(step);
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function updateStepIndicator(step) {
+            document.querySelectorAll('.step').forEach((s, index) => {
+                s.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    s.classList.add('completed');
+                } else if (index + 1 === step) {
+                    s.classList.add('active');
+                }
+            });
+            
+            for (let i = 1; i <= 2; i++) {
+                const line = document.getElementById(`line${i}`);
+                if (line) {
+                    line.classList.toggle('completed', i < step);
+                }
+            }
+        }
+
+        function updateConfirmation() {
+            document.getElementById('confirmCourse').textContent = selectedCourse.name;
+            document.getElementById('confirmDate').textContent = formatDisplayDate(selectedDate);
+            document.getElementById('confirmTime').textContent = `${selectedTime.startTime} - ${selectedTime.endTime}`;
+        }
+
+        // ============================================
+        // 確認預約
+        // ============================================
+        async function confirmBooking() {
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> 處理中...';
+
+            try {
+                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'createBooking',
+                        userId: userId,
+                        courseId: selectedCourse.id,
+                        courseName: selectedCourse.name,
+                        courseType: selectedCourse.type,
+                        date: selectedDate,
+                        startTime: selectedTime.startTime,
+                        endTime: selectedTime.endTime,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess();
+                } else {
+                    throw new Error(result.message || '預約失敗');
+                }
+            } catch (error) {
+                console.error('Create booking failed:', error);
+                alert('預約失敗：' + error.message);
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '確認預約';
+            }
+        }
+
+        function goToPayment() {
+            // 導向 FITBOOK 付款連結
+            if (existingBooking && existingBooking.paymentUrl) {
+                window.location.href = existingBooking.paymentUrl;
+            } else {
+                // 測試模式
+                alert('模擬：導向 FITBOOK 付款頁面');
+            }
+        }
+
+        function showSuccess() {
+            // 計算付款期限（12小時後）
+            const deadline = new Date();
+            deadline.setHours(deadline.getHours() + 12);
+            
+            const deadlineStr = `${deadline.getFullYear()}/${(deadline.getMonth() + 1).toString().padStart(2, '0')}/${deadline.getDate().toString().padStart(2, '0')} ${deadline.getHours().toString().padStart(2, '0')}:${deadline.getMinutes().toString().padStart(2, '0')}`;
+            
+            document.getElementById('paymentDeadline').textContent = `期限至 ${deadlineStr}`;
+            
+            // 顯示預約資訊
+            document.getElementById('reservedCourse').textContent = selectedCourse.name;
+            document.getElementById('reservedDate').textContent = formatDisplayDate(selectedDate);
+            document.getElementById('reservedTime').textContent = `${selectedTime.startTime} - ${selectedTime.endTime}`;
+            
+            document.getElementById('stepIndicator').style.display = 'none';
+            showSection('successSection');
+        }
+
+        // ============================================
+        // 取消預約
+        // ============================================
+        function showCancelModal() {
+            document.getElementById('cancelModal').classList.add('active');
+        }
+
+        function hideCancelModal() {
+            document.getElementById('cancelModal').classList.remove('active');
+        }
+
+        async function cancelBooking() {
+            const cancelBtn = document.querySelector('#cancelModal .btn-danger');
+            cancelBtn.disabled = true;
+            cancelBtn.textContent = '取消中...';
+            
+            try {
+                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'cancelBooking',
+                        userId: userId,
+                        bookingId: existingBooking?.id
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    hideCancelModal();
+                    existingBooking = null;
+                    showBookingFlow();
+                    alert('預約已取消，您可以重新預約');
+                } else {
+                    throw new Error(result.message || '取消失敗');
+                }
+            } catch (error) {
+                console.error('Cancel booking failed:', error);
+                alert('取消失敗：' + error.message);
+            } finally {
+                cancelBtn.disabled = false;
+                cancelBtn.textContent = '確定取消';
+            }
+        }
+
+        function closeLiff() {
+            if (liff.isInClient()) {
+                liff.closeWindow();
+            } else {
+                // 非 LIFF 環境（瀏覽器直接開啟）
+                window.close();
+            }
+        }
+
+        // ============================================
+        // 工具函數
+        // ============================================
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDisplayDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            return `${date.getMonth() + 1}月${date.getDate()}日 (${weekdays[date.getDay()]})`;
+        }
+    </script>
+</body>
+</html>

@@ -1256,18 +1256,21 @@
                 if (CONFIG.LIFF_ID) {
                     await liff.init({ liffId: CONFIG.LIFF_ID });
                     
-                    if (!liff.isLoggedIn()) {
+                    if (liff.isLoggedIn()) {
+                        const profile = await liff.getProfile();
+                        userId = profile.userId;
+                    } else if (liff.isInClient()) {
+                        // 在 LINE 內但未登入，執行登入
                         liff.login();
                         return;
+                    } else {
+                        // 在外部瀏覽器，使用測試 ID
+                        userId = 'test_user_' + Date.now();
+                        console.log('非 LINE 環境，使用測試 userId:', userId);
                     }
-                    
-                    const profile = await liff.getProfile();
-                    userId = profile.userId;
                 } else {
-                    // LIFF ID 未設定時的錯誤處理
-                    console.error('LIFF ID 未設定');
-                    alert('系統設定錯誤，請聯繫客服');
-                    return;
+                    // LIFF ID 未設定，使用測試 ID
+                    userId = 'test_user_' + Date.now();
                 }
                 
                 // 檢查是否已有預約
@@ -1275,7 +1278,9 @@
                 
             } catch (error) {
                 console.error('Initialize failed:', error);
-                alert('載入失敗，請重新開啟頁面');
+                // 初始化失敗時，使用測試 ID 並繼續
+                userId = 'test_user_' + Date.now();
+                showBookingFlow();
             }
         }
 
@@ -1290,7 +1295,17 @@
                     })
                 });
                 
-                const data = await response.json();
+                // 檢查回應是否為 JSON
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    // Make.com 還沒設定好回傳 JSON，直接進入預約流程
+                    console.log('Webhook 未回傳有效 JSON，進入預約流程');
+                    showBookingFlow();
+                    return;
+                }
                 
                 if (data.hasBooking && data.booking) {
                     existingBooking = data.booking;
@@ -1300,6 +1315,7 @@
                 }
             } catch (error) {
                 console.error('Check booking failed:', error);
+                // Webhook 未就緒時，直接進入預約流程
                 showBookingFlow();
             }
         }
@@ -1415,11 +1431,6 @@
                 if (dateObj < today) {
                     dayDiv.classList.add('disabled');
                 } else {
-                    // 判斷是否有時段（測試用）
-                    if (mockDatesWithSlots.has(dateStr)) {
-                        dayDiv.classList.add('has-slots');
-                    }
-                    
                     // 判斷是否已選擇
                     if (selectedDate === dateStr) {
                         dayDiv.classList.add('selected');
@@ -1521,7 +1532,21 @@
                     })
                 });
                 
-                const data = await response.json();
+                // 檢查回應是否為 JSON
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    // Make.com 還沒設定好
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">⚠️</div>
+                            <p>系統設定中，請稍後再試</p>
+                        </div>
+                    `;
+                    return;
+                }
                 
                 if (data.slots && data.slots.length > 0) {
                     displayTimeSlots(data.slots);
@@ -1672,7 +1697,14 @@
                     })
                 });
 
-                const result = await response.json();
+                // 檢查回應是否為 JSON
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('系統設定中，請稍後再試');
+                }
 
                 if (result.success) {
                     showSuccess();
@@ -1742,7 +1774,14 @@
                     })
                 });
                 
-                const result = await response.json();
+                // 檢查回應是否為 JSON
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('系統設定中，請稍後再試');
+                }
                 
                 if (result.success) {
                     hideCancelModal();

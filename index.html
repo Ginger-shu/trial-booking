@@ -1335,11 +1335,11 @@
             const pendingSection = document.getElementById('pendingPaymentSection');
             const confirmedSection = document.getElementById('confirmedSection');
             
-            if (booking.status === '待付款' || booking.status === 'pending') {
+            if (booking.status === '保留中' || booking.status === '待付款' || booking.status === 'pending') {
                 statusBox.className = 'booking-status pending';
                 statusBox.innerHTML = `
                     <div class="booking-status-icon">⏳</div>
-                    <div class="booking-status-text">待付款</div>
+                    <div class="booking-status-text">保留中</div>
                 `;
                 
                 if (booking.deadline) {

@@ -957,8 +957,8 @@
         <div class="section" id="existingBookingSection">
             <div class="card">
                 <div class="card-title">
-                    <span class="icon">📋</span>
-                    您的體驗課程預約
+                    <span class="icon">⏳</span>
+                    預約保留中
                 </div>
                 
                 <div class="booking-status" id="bookingStatusBox">
@@ -983,15 +983,18 @@
                 <!-- 待付款狀態顯示 -->
                 <div id="pendingPaymentSection" style="display: none;">
                     <div class="payment-pending">
-                        <div class="payment-pending-icon">💳</div>
-                        <div class="payment-pending-title">請完成付款以確認預約</div>
+                        <div class="payment-pending-icon">✨</div>
+                        <div class="payment-pending-title">即將完成預約</div>
                         <div class="payment-pending-message">
-                            付款期限至 <strong id="existingDeadline">-</strong><br>
-                            逾時將自動釋出名額
+                            付款完成後，行政人員將進行確認<br>
+                            並傳送預約完成資訊到您的 LINE<br><br>
+                            <strong>付款期限至 <span id="existingDeadline">-</span></strong><br>
+                            逾時將自動釋出名額<br><br>
+                            謝謝您，期待課程中與您相見！
                         </div>
                     </div>
                     <button class="btn btn-payment" onclick="goToPayment()" style="margin-bottom: 15px;">
-                        💳 前往付款
+                        📱 返回 LINE 完成付款
                     </button>
                 </div>
 
@@ -1720,12 +1723,13 @@
         }
 
         function goToPayment() {
-            // 導向 FITBOOK 付款連結
-            if (existingBooking && existingBooking.paymentUrl) {
-                window.location.href = existingBooking.paymentUrl;
+            // 關閉 LIFF，回到 LINE 聊天室
+            // 讓用戶從 LINE 訊息中的連結去付款
+            if (liff.isInClient()) {
+                liff.closeWindow();
             } else {
-                // 測試模式
-                alert('模擬：導向 FITBOOK 付款頁面');
+                // 非 LIFF 環境
+                alert('請從 LINE 訊息中的連結完成付款');
             }
         }
 

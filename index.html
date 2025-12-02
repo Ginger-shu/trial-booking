@@ -789,6 +789,64 @@
             line-height: 1.6;
         }
 
+        /* 活力黃配色 - 預約保留中頁面 */
+        .existing-booking-card .card-title {
+            color: var(--yellow-dark);
+        }
+
+        .existing-summary {
+            background: var(--yellow-light);
+        }
+
+        .existing-summary .summary-value {
+            color: var(--yellow-dark);
+        }
+
+        .payment-pending-yellow {
+            background: linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow) 100%);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .payment-pending-yellow .payment-pending-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .payment-pending-yellow .payment-pending-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--yellow-dark);
+            margin-bottom: 10px;
+        }
+
+        .payment-pending-yellow .payment-pending-message {
+            font-size: 14px;
+            color: var(--yellow-dark);
+            line-height: 1.8;
+        }
+
+        .btn-payment-yellow {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(186, 158, 96, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-payment-yellow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(186, 158, 96, 0.5);
+        }
+
         /* Reserved Info */
         .reserved-info {
             background: var(--green-light);
@@ -951,17 +1009,13 @@
 
         <!-- Existing Booking Section -->
         <div class="section" id="existingBookingSection">
-            <div class="card">
+            <div class="card existing-booking-card">
                 <div class="card-title">
                     <span class="icon">⏳</span>
                     預約保留中
                 </div>
-                
-                <div class="booking-status" id="bookingStatusBox">
-                    <!-- 狀態會由 JS 動態更新 -->
-                </div>
 
-                <div class="summary-box" style="margin-top: 20px;">
+                <div class="summary-box existing-summary">
                     <div class="summary-item">
                         <span class="summary-label">課程類型</span>
                         <span class="summary-value" id="existingCourse">-</span>
@@ -978,19 +1032,17 @@
 
                 <!-- 待付款狀態顯示 -->
                 <div id="pendingPaymentSection" style="display: none;">
-                    <div class="payment-pending">
+                    <div class="payment-pending-yellow">
                         <div class="payment-pending-icon">✨</div>
                         <div class="payment-pending-title">即將完成預約</div>
                         <div class="payment-pending-message">
                             付款連結已傳送給您<br>
                             完成付款後，行政人員將進行確認<br>
                             並傳送預約完成資訊到您的 LINE<br>
-                            謝謝您，期待課程中與您相見！<br><br>
-                            <strong>付款期限至 <span id="existingDeadline">-</span></strong><br>
-                            逾時將自動釋出名額
+                            謝謝您，期待課程中與您相見！
                         </div>
                     </div>
-                    <button class="btn btn-payment" onclick="goToPayment()" style="margin-bottom: 15px;">
+                    <button class="btn btn-payment-yellow" onclick="goToPayment()" style="margin-bottom: 15px;">
                         📱 返回 LINE 完成付款
                     </button>
                 </div>
@@ -1257,16 +1309,13 @@
                     await liff.init({ liffId: CONFIG.LIFF_ID });
                     
                     if (liff.isLoggedIn()) {
+                        // 已登入，取得用戶資料
                         const profile = await liff.getProfile();
                         userId = profile.userId;
-                    } else if (liff.isInClient()) {
-                        // 在 LINE 內但未登入，執行登入
+                    } else {
+                        // 未登入，執行登入（不管是 LINE 內還是外部瀏覽器）
                         liff.login();
                         return;
-                    } else {
-                        // 在外部瀏覽器，使用測試 ID
-                        userId = 'test_user_' + Date.now();
-                        console.log('非 LINE 環境，使用測試 userId:', userId);
                     }
                 } else {
                     // LIFF ID 未設定，使用測試 ID
@@ -1328,30 +1377,13 @@
                 booking.startTime && booking.endTime ? `${booking.startTime} - ${booking.endTime}` : '-';
             
             // 根據狀態顯示不同內容
-            const statusBox = document.getElementById('bookingStatusBox');
             const pendingSection = document.getElementById('pendingPaymentSection');
             const confirmedSection = document.getElementById('confirmedSection');
             
             if (booking.status === '保留中' || booking.status === '待付款' || booking.status === 'pending') {
-                statusBox.className = 'booking-status pending';
-                statusBox.innerHTML = `
-                    <div class="booking-status-icon">⏳</div>
-                    <div class="booking-status-text">保留中</div>
-                `;
-                
-                if (booking.deadline) {
-                    document.getElementById('existingDeadline').textContent = booking.deadline;
-                }
-                
                 pendingSection.style.display = 'block';
                 confirmedSection.style.display = 'none';
             } else {
-                statusBox.className = 'booking-status confirmed';
-                statusBox.innerHTML = `
-                    <div class="booking-status-icon">✅</div>
-                    <div class="booking-status-text">已確認</div>
-                `;
-                
                 pendingSection.style.display = 'none';
                 confirmedSection.style.display = 'block';
             }
@@ -1472,8 +1504,8 @@
                 prevBtn.disabled = false;
             }
             
-            // 最多往後3個月
-            const maxMonth = todayMonth + 3;
+            // 最多往後1個月（只顯示當月和下個月）
+            const maxMonth = todayMonth + 1;
             const maxYear = todayYear + Math.floor(maxMonth / 12);
             const adjustedMaxMonth = maxMonth % 12;
             
@@ -1569,7 +1601,22 @@
             container.innerHTML = '<div class="time-slots"></div>';
             const slotsContainer = container.querySelector('.time-slots');
             
+            // 去重複：相同時段只顯示一筆
+            const uniqueSlots = [];
+            const seenTimes = new Set();
+            
             slots.forEach(slot => {
+                const timeKey = `${slot.startTime}-${slot.endTime}`;
+                if (!seenTimes.has(timeKey)) {
+                    seenTimes.add(timeKey);
+                    uniqueSlots.push(slot);
+                }
+            });
+            
+            // 依開始時間排序
+            uniqueSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+            
+            uniqueSlots.forEach(slot => {
                 const div = document.createElement('div');
                 div.className = 'time-slot';
                 div.dataset.start = slot.startTime;

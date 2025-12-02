@@ -847,6 +847,103 @@
             box-shadow: 0 6px 20px rgba(186, 158, 96, 0.5);
         }
 
+        /* 幸福粉 - 即將完成預約區塊 */
+        .payment-pending-pink {
+            background: linear-gradient(135deg, var(--pink-light) 0%, var(--pink) 100%);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .payment-pending-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .payment-pending-icon-small {
+            font-size: 24px;
+        }
+
+        .payment-pending-pink .payment-pending-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--pink-dark);
+        }
+
+        .payment-pending-pink .payment-pending-message {
+            font-size: 14px;
+            color: var(--pink-dark);
+            line-height: 1.8;
+        }
+
+        /* 綠粉漸層 - 確認頁面 */
+        .confirm-card .card-title {
+            color: var(--green-dark);
+        }
+
+        .confirm-summary {
+            background: linear-gradient(135deg, var(--green-light) 0%, var(--pink-light) 100%);
+        }
+
+        .confirm-summary .summary-value {
+            color: var(--green-dark);
+        }
+
+        .confirm-notice {
+            background: var(--pink-light);
+            border-left: 4px solid var(--pink);
+        }
+
+        .confirm-notice p {
+            color: var(--pink-dark);
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(122, 193, 154, 0.4);
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(95, 132, 111, 0.5);
+        }
+
+        /* 成功頁面緊湊版 */
+        .success-container-compact {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .success-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .success-icon-small {
+            font-size: 32px;
+        }
+
+        .success-container-compact .success-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--green-dark);
+        }
+
+        .success-container-compact .success-message {
+            color: var(--gray);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
         /* Reserved Info */
         .reserved-info {
             background: var(--green-light);
@@ -1032,9 +1129,11 @@
 
                 <!-- 待付款狀態顯示 -->
                 <div id="pendingPaymentSection" style="display: none;">
-                    <div class="payment-pending-yellow">
-                        <div class="payment-pending-icon">✨</div>
-                        <div class="payment-pending-title">即將完成預約</div>
+                    <div class="payment-pending-pink">
+                        <div class="payment-pending-header">
+                            <span class="payment-pending-icon-small">✨</span>
+                            <span class="payment-pending-title">即將完成預約</span>
+                        </div>
                         <div class="payment-pending-message">
                             付款連結已傳送給您<br>
                             完成付款後，行政人員將進行確認<br>
@@ -1042,7 +1141,7 @@
                             謝謝您，期待課程中與您相見！
                         </div>
                     </div>
-                    <button class="btn btn-payment-yellow" onclick="goToPayment()" style="margin-bottom: 15px;">
+                    <button class="btn btn-payment" onclick="goToPayment()" style="margin-bottom: 15px;">
                         📱 返回 LINE 完成付款
                     </button>
                 </div>
@@ -1166,13 +1265,13 @@
 
         <!-- Step 3: Confirmation -->
         <div class="section" id="step3Section">
-            <div class="card">
+            <div class="card confirm-card">
                 <div class="card-title">
                     <span class="icon">✅</span>
                     確認預約資訊
                 </div>
                 
-                <div class="summary-box">
+                <div class="summary-box confirm-summary">
                     <div class="summary-item">
                         <span class="summary-label">課程類型</span>
                         <span class="summary-value" id="confirmCourse">-</span>
@@ -1187,7 +1286,7 @@
                     </div>
                 </div>
 
-                <div class="notice">
+                <div class="notice confirm-notice">
                     <p>📌 確認預約後，付款連結將發送至您的 LINE。<br>
                     請於 12 小時內完成付款，逾時將自動釋出名額。</p>
                 </div>
@@ -1196,7 +1295,7 @@
                     <button class="btn btn-secondary" onclick="goToStep(2)">
                         ← 修改
                     </button>
-                    <button class="btn btn-primary" id="confirmBtn" onclick="confirmBooking()">
+                    <button class="btn btn-confirm" id="confirmBtn" onclick="confirmBooking()">
                         確認預約
                     </button>
                 </div>
@@ -1206,9 +1305,11 @@
         <!-- Success Section -->
         <div class="section" id="successSection">
             <div class="card">
-                <div class="success-container">
-                    <div class="success-icon">🎉</div>
-                    <div class="success-title">預約保留中！</div>
+                <div class="success-container-compact">
+                    <div class="success-header">
+                        <span class="success-icon-small">🎊</span>
+                        <span class="success-title">預約保留中！</span>
+                    </div>
                     <div class="success-message">
                         付款連結已發送至您的 LINE<br>
                         請於 <strong>12 小時內</strong> 完成付款<br>
